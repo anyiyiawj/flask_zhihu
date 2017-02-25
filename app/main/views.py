@@ -7,4 +7,4 @@ from ..models import User
 
 @main.route('/',methods=['GET','POST'])
 def index():
-    return render_template('index.html',current_time=datetime.utcnow())
+    return render_template('index.html')

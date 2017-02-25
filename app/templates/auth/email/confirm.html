@@ -1,0 +1,6 @@
+<p>亲爱的{{ user.username }}用户</p>
+<p>欢迎加入<b>知乎</b>！</p>
+<p>为了确认账户，请点击下面的连接： <a href="{{ url_for('auth.confirm', token=token, _external=True) }}">click here</a>.</p>
+
+<p>欢迎你的知乎团队</p>
+<p><small>注：回复此信件不会被回复</small></p>

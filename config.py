@@ -5,8 +5,8 @@ class Config:
     SECRET_KEY=os.environ.get('SECRET_KEY') or 'hard to guess string'
     SQLALCHEMY_COMMIT_ON_TEARDOWN=True
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    ZHIHU_MAIL_SUBJECT_PERFIZ='[知乎]'
-    ZHIHU_MAIL_SENDER='知乎 <1970841978@qq.com>'
+    ZHIHU_MAIL_SUBJECT_PERFIX='[知乎]'
+    ZHIHU_MAIL_SENDER='Zhihu <1970841978@qq.com>'
     ZHIHU_ADMIN=os.environ.get('ZHIHU_ADMIN')
 
     @staticmethod
