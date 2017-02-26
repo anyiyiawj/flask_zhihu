@@ -8,9 +8,11 @@ from ..email import send_email
 
 @auth.before_app_request#针对全局请求的钩子
 def before_request():
-    if current_user.is_authenticated and not current_user.confirmed \
+    if current_user.is_authenticated:
+        current_user.ping()#刷新最后登录时间
+        if not current_user.confirmed \
             and request.endpoint[:5]!='auth.' and request.endpoint!='static':#登录未确认，请求不再蓝本和静态文件中
-        return redirect(url_for('auth.unconfirmed'))#返回为认证页面
+            return redirect(url_for('auth.unconfirmed'))#返回为认证页面
 
 @auth.route('/unconfirmed')
 def unconfirmed():
