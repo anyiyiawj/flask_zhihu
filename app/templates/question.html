@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% block title%}{{question.title}}{% endblock %}
+
+{% block page_content %}
+<div class="page_content">
+    {% for i in question.topics %}
+    <button type="button" class="btn btn-info btn btn-sm">{{i.name}}</button>
+    {% endfor %}
+    <h3><span class="text-primary">{{ question.title }}</span></h3>
+    <p>{{ question.description }}</p>
+    <p><span class="glyphicon glyphicon-user">{{ question.asker.username }}</span></p><hr />
+</div>
+<div>
+    {% for answer in Answer.query.filter_by(question=question).all() %}
+        <a><img src="{{ answer.author.gravatar(size=18) }}">{{ answer.author.username }}</a>
+        <p>{{ answer.context}}</p><hr />
+    {% endfor %}
+</div>
+<div>
+    {{wtf.quick_form(form)}}
+</div>
+{% endblock %}

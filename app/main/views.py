@@ -2,9 +2,9 @@ from datetime import datetime
 from flask import render_template,session,redirect,url_for,abort,flash
 from flask_login import login_required,current_user
 from . import main
-from .forms import EditProfileForm,EditProfileAdminForm
+from .forms import QuestionForm,AnswerForm,EditProfileForm,EditProfileAdminForm
 from .. import db
-from ..models import User,Role
+from ..models import User,Role,Topic,Question,Answer
 from ..decorators import admin_required
 
 @main.route('/',methods=['GET','POST'])
@@ -17,6 +17,36 @@ def user(username):
     if user is None:
         abort(404)
     return render_template('user.html',user=user)
+
+@main.route('/question/<int:id>',methods=['GET','POST'])
+@login_required
+def question(id):
+    question=Question.query.get(id)
+    if question is None:
+        abort(404)
+    form = AnswerForm()
+    if form.validate_on_submit():
+        answer=Answer(context=form.context.data,
+                      question=question,
+                      author=current_user._get_current_object())
+        db.session.add(answer)
+        db.session.commit()
+        return redirect(url_for('.question',id=question.id))
+    return render_template('question.html',question=question,form=form)
+
+@main.route('/ask',methods=['GET','POST'])
+@login_required
+def ask():
+    form=QuestionForm()
+    if form.validate_on_submit():
+        question=Question(description=form.description.data,
+                          title=form.title.data,
+                          asker=current_user._get_current_object())
+        question.add_topics(form.topic.data)
+        db.session.add(question)
+        db.session.commit()
+        return redirect(url_for('.question',id=question.id))
+    return render_template('ask.html',form=form)
 
 @main.route('/edit-profile',methods=['GET','POST'])
 @login_required

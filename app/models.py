@@ -59,6 +59,8 @@ class User(UserMixin,db.Model):
     role_id=db.Column(db.Integer,db.ForeignKey('roles.id'))
     password_hash=db.Column(db.String(128))
     confirmed=db.Column(db.Boolean,default=False)
+    questions = db.relationship('Question', backref='asker', lazy='dynamic')
+    answers = db.relationship('Answer', backref='author', lazy='dynamic')
 
     def __init__(self,**kwargs):
         super(User,self).__init__(**kwargs)
@@ -129,3 +131,43 @@ class AnonymousUser(AnonymousUserMixin):#未注册的人
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
+
+descs=db.Table('descs',
+    db.Column('topic_id',db.Integer,db.ForeignKey('topics.id')),
+    db.Column('question_id',db.Integer,db.ForeignKey('questions.id'))
+)#topic和question之间的多对多关系
+
+class Topic(db.Model):
+    __tablename__='topics'
+    id=db.Column(db.Integer,primary_key=True)
+    name=db.Column(db.String(64),unique=True)
+    questions = db.relationship('Question', secondary=descs,
+                                backref=db.backref('topics',lazy='dynamic'),lazy='dynamic')
+
+class Question(db.Model):
+    __tablename__='questions'
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(64),unique=True)
+    description=db.Column(db.Text())
+    create_time = db.Column(db.DateTime(), default=datetime.utcnow)
+    asker_id=db.Column(db.Integer,db.ForeignKey('users.id'))
+    answers=db.relationship('Answer',backref='question',lazy='dynamic')
+
+    def add_topics(self,string):
+        list = string.split()
+        for i in list:
+            if Topic.query.filter_by(name=i).first():
+                self.topics.append(Topic.query.filter_by(name=i).first())
+            else:
+                topic=Topic(name=i)
+                db.session.add(topic)
+                self.topics.append(topic)
+
+class Answer(db.Model):
+    __tablename__ = 'answers'
+    id = db.Column(db.Integer, primary_key=True)
+    context = db.Column(db.Text())
+    answer_time=db.Column(db.DateTime(),default=datetime.utcnow)
+    question_id = db.Column(db.Integer, db.ForeignKey('questions.id'))
+    author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+

@@ -4,6 +4,16 @@ from wtforms.validators import Length,Required,Email,Regexp
 from wtforms import ValidationError
 from ..models import Role,User
 
+class QuestionForm(FlaskForm):
+    title=StringField('问题',validators=[Required()])
+    description=TextAreaField('问题描述')
+    topic=StringField('添加话题')
+    submit = SubmitField('提交')
+
+class AnswerForm(FlaskForm):
+    context=TextAreaField('回答')
+    submit = SubmitField('提交')
+
 class EditProfileForm(FlaskForm):
     location=StringField('地址',validators=[Length(0,64)])
     about_me=TextAreaField('我的简介')
