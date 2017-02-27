@@ -42,13 +42,15 @@ def edit_profile_admin(id):
         user.email=form.email.data
         user.username = form.username.data
         user.confirmed = form.confirmed.data
-        user.role = Role.query.get(form.role.data)#注意
+        user.role = Role.query.get(form.role.data)#注意，添加外键的用法
         user.location = form.location.data
         user.about_me = form.about_me.data
+        flash('个人信息已更新')
+        return redirect(url_for('.user', username=user.username))
+    form.username.date = user.username
     form.email.data=user.email
-    form.username.date=user.username
     form.confirmed.data=user.confirmed
-    form.role.data=user.role_id
+    form.role.data=user.role_id#注意
     form.location.data=user.location
     form.about_me.data=user.about_me
     return render_template('edit_profile.html',form=form,user=user)
