@@ -8,6 +8,7 @@ class Config:
     ZHIHU_MAIL_SUBJECT_PERFIX='[知乎]'
     ZHIHU_MAIL_SENDER='Zhihu <1970841978@qq.com>'
     ZHIHU_ADMIN=os.environ.get('ZHIHU_ADMIN')
+    ZHIHU_FOLLOWERS_PER_PAGE=20
 
     @staticmethod
     def init_app(app):

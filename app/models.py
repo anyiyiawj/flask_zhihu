@@ -46,6 +46,12 @@ class Role(db.Model):
     def __repr__(self):
         return '<Role %r>'%self.name
 
+class Follow(db.Model):
+    __tablename__='follows'
+    follower_id=db.Column(db.Integer,db.ForeignKey('users.id'),primary_key=True)#关注者
+    followed_id = db.Column(db.Integer, db.ForeignKey('users.id'), primary_key=True)#被关注者
+    timestamp=db.Column(db.DateTime,default=datetime.utcnow)
+
 class User(UserMixin,db.Model):
     __tablename__='users'
     id=db.Column(db.Integer,primary_key=True)
@@ -61,6 +67,12 @@ class User(UserMixin,db.Model):
     confirmed=db.Column(db.Boolean,default=False)
     questions = db.relationship('Question', backref='asker', lazy='dynamic')
     answers = db.relationship('Answer', backref='author', lazy='dynamic')
+    followed=db.relationship('Follow',foreign_keys=[Follow.follower_id],
+                             backref=db.backref('follower',lazy='joined'),
+                             lazy='dynamic',cascade='all,delete-orphan')
+    followers=db.relationship('Follow',foreign_keys=[Follow.follower_id],
+                             backref=db.backref('followed',lazy='joined'),
+                             lazy='dynamic',cascade='all,delete-orphan')
 
     def __init__(self,**kwargs):
         super(User,self).__init__(**kwargs)
@@ -117,6 +129,22 @@ class User(UserMixin,db.Model):
         self.confirmed=True
         db.session.add(self)
         return True
+
+    def follow(self,user):
+        if not self.is_following(user):
+            f=Follow(follower_id=self.id, followed_id=user.id)#可以直接调用，也可以用id
+            db.session.add(f)
+
+    def unfollow(self,user):
+        f=self.followed.filter_by(followed_id=user.id).first()
+        if f:
+            db.session.delete(f)
+
+    def is_following(self,user):#是否关注这个人
+        return self.followed.filter_by(followed_id=user.id).first() is not None
+    #查询的时候filter_by用id来查
+    def is_followed_by(self,user):#是否被这个人关注
+        return self.follwers.filter_by(follower_id=user.id).first() is not None
 
     def __repr__(self):
         return '<User %r>'%self.username

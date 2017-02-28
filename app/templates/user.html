@@ -19,6 +19,22 @@
         <p><a href="mailto:{{user.email}}">{{ user.email }}</a></p>
         {% endif %}
 
+        {%if current_user.can(Permission.USER) and user !=current_user%}
+            {%if not current_user.is_following(user)%}
+                <a href="{{url_for('activity.follow',username=user.username)}}" class="btn btn-primary">关注</a>
+            {% else %}
+                <a href="{url_for('activity.followers',username=user.username)}}" class="btn btn-default">取消关注</a>
+            {% endif %}
+        {% endif %}
+        <a href="{{url_for('activity.followers',username=user.username)}}">
+            关注ta的人：<span class="badge">{{ user.followers.count()}}</span>
+        </a>
+        <a href="{{url_for('activity.followered_by',username=user.username)}}">
+            关注ta的人：<span class="badge">{{ user.followed.count()}}</span>
+        </a>
+        {% if current_user.is_authenticated and user !=current_user and user.is_following(current_user)%}
+            <span class="label label-default">ta关注你</span>
+        {% endif %}
         {% if user.about_me %}<p>个人介绍</p><p>{{user.about_me}}</p>{% endif %}
         <p>
             用户注册时间：{{ moment(user.member_since).format('L')}}
