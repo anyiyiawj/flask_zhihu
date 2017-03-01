@@ -23,7 +23,7 @@
             {%if not current_user.is_following(user)%}
                 <a href="{{url_for('activity.follow',username=user.username)}}" class="btn btn-primary">关注</a>
             {% else %}
-                <a href="{url_for('activity.followers',username=user.username)}}" class="btn btn-default">取消关注</a>
+                <a href="{{url_for('activity.unfollow',username=user.username)}}" class="btn btn-default">取消关注</a>
             {% endif %}
         {% endif %}
         <a href="{{url_for('activity.followers',username=user.username)}}">

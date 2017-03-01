@@ -14,7 +14,7 @@
 <div>
     {% for answer in Answer.query.filter_by(question=question).all() %}
         <a><img src="{{ answer.author.gravatar(size=18) }}">{{ answer.author.username }}</a>
-        <p>{{ answer.context}}</p><hr />
+        <p><a href="{{url_for('.answer',id=answer.id)}}">{{ answer.content}}</a></p><hr />
     {% endfor %}
 </div>
 <div>

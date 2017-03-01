@@ -3,8 +3,9 @@ from flask_login import login_required,current_user
 from . import main
 from .forms import QuestionForm,AnswerForm,EditProfileForm,EditProfileAdminForm
 from .. import db
-from ..models import User,Role,Topic,Question,Answer
+from ..models import User,Role,Topic,Question,Answer,Comment
 from ..decorators import admin_required
+from ..activity.forms import CommentForm
 
 @main.route('/',methods=['GET','POST'])
 def index():
@@ -25,7 +26,7 @@ def question(id):
         abort(404)
     form = AnswerForm()
     if form.validate_on_submit():
-        answer=Answer(context=form.context.data,
+        answer=Answer(content=form.content.data,
                       question=question,
                       author=current_user._get_current_object())
         db.session.add(answer)
@@ -46,6 +47,21 @@ def ask():
         db.session.commit()
         return redirect(url_for('.question',id=question.id))
     return render_template('ask.html',form=form)
+
+@main.route('/answer/<int:id>',methods=['GET','POST'])
+@login_required
+def answer(id):
+    answer=Answer.query.get(id)
+    if answer is None:
+        abort(404)
+    form =CommentForm()
+    if form.validate_on_submit():
+        comment=Comment(content=form.content.data,
+                        answer=answer,
+                        author=current_user._get_current_object())
+        db.session.add(comment)
+        return redirect(url_for('.answer',id=answer.id))
+    return render_template('answer.html',answer=answer,form=form)
 
 @main.route('/edit-profile',methods=['GET','POST'])
 @login_required

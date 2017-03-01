@@ -48,8 +48,8 @@ class Role(db.Model):
 
 class Follow(db.Model):
     __tablename__='follows'
-    follower_id=db.Column(db.Integer,db.ForeignKey('users.id'),primary_key=True)#关注者
-    followed_id = db.Column(db.Integer, db.ForeignKey('users.id'), primary_key=True)#被关注者
+    follower_id=db.Column(db.Integer,db.ForeignKey('users.id'),primary_key=True)#关注者，外键
+    followed_id = db.Column(db.Integer, db.ForeignKey('users.id'), primary_key=True)#被关注者，外键
     timestamp=db.Column(db.DateTime,default=datetime.utcnow)
 
 class User(UserMixin,db.Model):
@@ -67,12 +67,13 @@ class User(UserMixin,db.Model):
     confirmed=db.Column(db.Boolean,default=False)
     questions = db.relationship('Question', backref='asker', lazy='dynamic')
     answers = db.relationship('Answer', backref='author', lazy='dynamic')
+    comments=db.relationship('Comment',backref='author',lazy='dynamic')
     followed=db.relationship('Follow',foreign_keys=[Follow.follower_id],
                              backref=db.backref('follower',lazy='joined'),
-                             lazy='dynamic',cascade='all,delete-orphan')
-    followers=db.relationship('Follow',foreign_keys=[Follow.follower_id],
+                             lazy='dynamic',cascade='all,delete-orphan')#我关注的人
+    followers=db.relationship('Follow',foreign_keys=[Follow.followed_id],
                              backref=db.backref('followed',lazy='joined'),
-                             lazy='dynamic',cascade='all,delete-orphan')
+                             lazy='dynamic',cascade='all,delete-orphan')#谁关注我
 
     def __init__(self,**kwargs):
         super(User,self).__init__(**kwargs)
@@ -194,8 +195,20 @@ class Question(db.Model):
 class Answer(db.Model):
     __tablename__ = 'answers'
     id = db.Column(db.Integer, primary_key=True)
-    context = db.Column(db.Text())
+    content = db.Column(db.Text())
     answer_time=db.Column(db.DateTime(),default=datetime.utcnow)
     question_id = db.Column(db.Integer, db.ForeignKey('questions.id'))
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    comments=db.relationship('Comment',backref='answer',lazy='dynamic')
+    def __repr__(self):
+        return '<Comm %r>'%self.content
 
+class Comment(db.Model):
+    __tablename__='comments'
+    id=db.Column(db.Integer,primary_key=True)
+    content=db.Column(db.Text())
+    create_time=db.Column(db.DateTime(),default=datetime.utcnow)
+    answer_id=db.Column(db.Integer,db.ForeignKey('answers.id'))
+    commenter_id=db.Column(db.Integer,db.ForeignKey('users.id'))
+    def __repr__(self):
+        return '<Comm %r>'%self.content

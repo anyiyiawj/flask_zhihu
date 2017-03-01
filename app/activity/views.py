@@ -15,7 +15,7 @@ def follow(username):
     if current_user.is_following(user):
         flash("你已经关注这个用户了")
         return redirect(url_for('main.user',username=username))
-    current_user._get_current_object().follow(user)
+    current_user.follow(user)
     flash('你已经关注了%s。'%username)
     return redirect(url_for('main.user',username=username))
 
@@ -30,7 +30,7 @@ def unfollow(username):
     if not current_user.is_following(user):
         flash("你没有关注这个用户了")
         return redirect(url_for('main.user',username=username))
-    current_user._get_current_object().unfollow(user)
+    current_user.unfollow(user)
     flash('你已经取消关注%s。'%username)
     return  redirect(url_for('main.user',username=username))
 

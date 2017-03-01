@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% block title%}评论{% endblock %}
+
+{% block page_content %}
+<div class="page_content">
+    <h3><span class="text-primary">{{ answer.question.title }}</span></h3>
+    <p>{{ answer.question.description }}</p>
+    <p><span class="glyphicon glyphicon-user">{{ answer.question.asker.username }}</span></p><hr />
+</div>
+<div>
+    <a><img src="{{ answer.author.gravatar(size=18) }}">{{ answer.author.username }}</a>
+    <p>{{ answer.content}}</p><hr />
+</div>
+<div>
+    {% for comment in Comment.query.filter_by(answer=answer).all() %}
+        <a><img src="{{ comment.author.gravatar(size=18) }}">{{ comment.author.username }}</a>
+        <span>{{ comment.content}}</span><hr />
+    {% endfor %}
+</div>
+<div>
+    {{wtf.quick_form(form)}}
+</div>
+{% endblock %}

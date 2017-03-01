@@ -11,7 +11,7 @@ class QuestionForm(FlaskForm):
     submit = SubmitField('提交')
 
 class AnswerForm(FlaskForm):
-    context=TextAreaField('回答')
+    content=TextAreaField('回答')
     submit = SubmitField('提交')
 
 class EditProfileForm(FlaskForm):
